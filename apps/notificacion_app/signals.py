@@ -9,7 +9,7 @@ import logging
 from .models import notificacion
 from .utils import enviar_a_grupo
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger(_name_)
 
 # ================================
 # IMPORTS EXTERNOS (otras apps)
@@ -29,8 +29,9 @@ try:
 except ImportError:
     Mensaje = None
 
+
 # --------------------------------------------------------
-# Notificación cuando alguien da LIKE
+# NOTIFICACIÓN POR LIKE
 # --------------------------------------------------------
 if DetalleLike is not None:
     @receiver(post_save, sender=DetalleLike)
@@ -50,7 +51,7 @@ if DetalleLike is not None:
         notif = notificacion.objects.create(
             tipo=notificacion.EVENT_LIKE,
             mensaje=mensaje,
-            usuario_destino=usuario_receptor,
+            usuario_destino=usuario_receptor
         )
 
         payload = {
@@ -58,6 +59,7 @@ if DetalleLike is not None:
             "tipo": notif.tipo,
             "mensaje": notif.mensaje,
             "fecha_envio": notif.fecha_envio.isoformat(),
+
             "from_user_id": usuario_emisor.id,
             "from_username": usuario_emisor.username,
         }
@@ -70,8 +72,9 @@ if DetalleLike is not None:
             )
         )
 
+
 # --------------------------------------------------------
-# Notificación cuando hay MATCH
+# NOTIFICACIÓN POR MATCH
 # --------------------------------------------------------
 if Match is not None:
     @receiver(post_save, sender=Match)
@@ -79,12 +82,11 @@ if Match is not None:
         if not created:
             return
 
-        logger.info(f"Signal match activado para Match id={instance.id}")
+        logger.info(f"Signal MATCH activado para Match id={instance.id}")
 
         user_a = instance.usuarioA
         user_b = instance.usuarioB
 
-        # Obtener el chat asociado
         try:
             chat = instance.chat
         except:
@@ -92,9 +94,13 @@ if Match is not None:
 
         chat_id = chat.id if chat else None
 
-        # Usuario A
+        # Notificación para usuario A
         try:
-            mensaje_a = f"Match. Tienes un nuevo match con {user_b.nombres if hasattr(user_b, 'nombres') else user_b.username}"
+            mensaje_a = (
+                f"Match! Tienes un nuevo match con "
+                f"{getattr(user_b, 'nombres', user_b.username)}"
+            )
+
             notif_a = notificacion.objects.create(
                 tipo=notificacion.EVENT_MATCH,
                 mensaje=mensaje_a,
@@ -117,12 +123,17 @@ if Match is not None:
                     payload_a
                 )
             )
-        except Exception as e:
-            logger.error(f"Error al crear notificación de match para usuario A: {e}")
 
-        # Usuario B
+        except Exception as e:
+            logger.error(f"Error creando notificación MATCH para usuario A: {e}")
+
+        # Notificación para usuario B
         try:
-            mensaje_b = f"Match. Tienes un nuevo match con {user_a.nombres if hasattr(user_a, 'nombres') else user_a.username}"
+            mensaje_b = (
+                f"Match! Tienes un nuevo match con "
+                f"{getattr(user_a, 'nombres', user_a.username)}"
+            )
+
             notif_b = notificacion.objects.create(
                 tipo=notificacion.EVENT_MATCH,
                 mensaje=mensaje_b,
@@ -145,11 +156,13 @@ if Match is not None:
                     payload_b
                 )
             )
+
         except Exception as e:
-            logger.error(f"Error al crear notificación de match para usuario B: {e}")
+            logger.error(f"Error creando notificación MATCH para usuario B: {e}")
+
 
 # --------------------------------------------------------
-# Notificación cuando llega un MENSAJE de chat
+# NOTIFICACIÓN POR NUEVO MENSAJE DE CHAT
 # --------------------------------------------------------
 if Mensaje is not None:
     @receiver(post_save, sender=Mensaje)
@@ -164,13 +177,11 @@ if Mensaje is not None:
         usuarioA = chat.match.usuarioA
         usuarioB = chat.match.usuarioB
 
-        # Identificar receptor
         receptor = usuarioB if remitente == usuarioA else usuarioA
 
         if receptor is None:
             return
 
-        # Evitar notificación si el receptor tiene el chat abierto
         cache_key = f"chat_abierto_usuario_{receptor.id}"
         chat_abierto_id = cache.get(cache_key)
 
@@ -181,7 +192,7 @@ if Mensaje is not None:
         notif = notificacion.objects.create(
             tipo=notificacion.EVENT_CHAT,
             mensaje=texto,
-            usuario_destino=receptor,
+            usuario_destino=receptor
         )
 
         payload = {
@@ -189,6 +200,7 @@ if Mensaje is not None:
             "tipo": notif.tipo,
             "mensaje": notif.mensaje,
             "fecha_envio": notif.fecha_envio.isoformat(),
+            "chat_id": chat.id,
         }
 
         transaction.on_commit(

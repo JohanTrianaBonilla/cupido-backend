@@ -1,5 +1,6 @@
 #!/bin/bash
 echo "🔄 Running migrations..."
+python manage.py makemigrations notificacion_app
 python manage.py migrate
 echo "🚀 Starting Daphne server..."
 exec daphne \
