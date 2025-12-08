@@ -15,9 +15,9 @@ logger = logging.getLogger(__name__)
 # IMPORTS EXTERNOS (otras apps)
 # ================================
 try:
-    from detallesLike.models import DetalleLike
+    from apps.like_app.models import DetallesLike
 except ImportError:
-    DetalleLike = None
+    DetallesLike = None
 
 try:
     from match.models import Match
@@ -34,10 +34,14 @@ except ImportError:
 # --------------------------------------------------------
 # NOTIFICACIÓN POR LIKE
 # --------------------------------------------------------
-if DetalleLike is not None:
-    @receiver(post_save, sender=DetalleLike)
+if DetallesLike is not None:
+    @receiver(post_save, sender=DetallesLike)
     def crear_notificacion_desde_like(sender, instance, created, **kwargs):
         if not created:
+            return
+        
+        # Solo notificar si es un LIKE positivo
+        if instance.estado != 'LIKE':
             return
 
         usuario_emisor = getattr(instance, 'usuarioEmisor', None)
