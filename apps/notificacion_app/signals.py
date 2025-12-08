@@ -9,7 +9,7 @@ import logging
 from .models import notificacion
 from .utils import enviar_a_grupo
 
-logger = logging.getLogger(_name_)
+logger = logging.getLogger(__name__)
 
 # ================================
 # IMPORTS EXTERNOS (otras apps)
