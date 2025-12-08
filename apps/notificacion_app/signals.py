@@ -25,9 +25,10 @@ except ImportError:
     Match = None
 
 try:
-    from apps.chat_app.models import Mensaje
+    from apps.chat_app.models import Mensaje, Chat
 except ImportError:
     Mensaje = None
+    Chat = None
 
 
 # --------------------------------------------------------
@@ -77,23 +78,23 @@ if DetalleLike is not None:
 # --------------------------------------------------------
 # NOTIFICACIÓN POR MATCH
 # --------------------------------------------------------
-if Match is not None:
-    @receiver(post_save, sender=Match)
-    def crear_notificacion_desde_match(sender, instance, created, **kwargs):
+if Chat is not None:
+    @receiver(post_save, sender=Chat)
+    def crear_notificacion_desde_chat_match(sender, instance, created, **kwargs):
         if not created:
             return
 
-        logger.info(f"Signal MATCH activado para Match id={instance.id}")
+        logger.info(f"Signal MATCH (via Chat) activado para Chat id={instance.id}")
 
-        user_a = instance.usuarioA
-        user_b = instance.usuarioB
+        # El 'instance' ahora es el Chat
+        chat = instance
+        match = chat.match
+        
+        user_a = match.usuarioA
+        user_b = match.usuarioB
 
-        try:
-            chat = instance.chat
-        except:
-            chat = None
-
-        chat_id = chat.id if chat else None
+        # Ya tenemos el chat, es 'instance'
+        chat_id = chat.id
 
         # Notificación para usuario A
         try:
