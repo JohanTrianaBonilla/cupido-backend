@@ -51,7 +51,8 @@ if DetalleLike is not None:
         notif = notificacion.objects.create(
             tipo=notificacion.EVENT_LIKE,
             mensaje=mensaje,
-            usuario_destino=usuario_receptor
+            usuario_destino=usuario_receptor,
+            usuario_origen=usuario_emisor,
         )
 
         payload = {
@@ -104,7 +105,9 @@ if Match is not None:
             notif_a = notificacion.objects.create(
                 tipo=notificacion.EVENT_MATCH,
                 mensaje=mensaje_a,
-                usuario_destino=user_a
+                usuario_destino=user_a,
+                usuario_origen=user_b,
+                chat_relacionado=chat
             )
 
             payload_a = {
@@ -137,7 +140,9 @@ if Match is not None:
             notif_b = notificacion.objects.create(
                 tipo=notificacion.EVENT_MATCH,
                 mensaje=mensaje_b,
-                usuario_destino=user_b
+                usuario_destino=user_b,
+                usuario_origen=user_a,
+                chat_relacionado=chat
             )
 
             payload_b = {

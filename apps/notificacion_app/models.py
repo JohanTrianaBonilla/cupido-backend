@@ -51,7 +51,9 @@ class notificacion(models.Model):
     usuario_origen = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
-        related_name='notificaciones_origen'
+        null=True,
+        blank=True,
+        related_name='notificaciones_enviadas'
     )
 
     class Meta:
