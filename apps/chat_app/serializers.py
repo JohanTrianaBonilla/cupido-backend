@@ -11,11 +11,23 @@ User = get_user_model()
 # ASUMIMOS: Que tu modelo User tiene campos como 'nombres' y 'apellido'.
 # -----------------------------------------------
 class ContactoChatSerializer(serializers.ModelSerializer):
+    imagen_principal = serializers.SerializerMethodField()
+
     class Meta:
         model = User
         # Adapta estos campos a los que quieres mostrar en el panel de lista de chats
         # last_login viene de AbstractUser y lo usaremos como "última vez en línea"
-        fields = ('id', 'nombres', 'apellidos', 'email', 'last_login') 
+        fields = ('id', 'nombres', 'apellidos', 'email', 'last_login', 'imagen_principal') 
+
+    def get_imagen_principal(self, obj):
+        try:
+            # Buscamos la imagen principal en la relación inversa 'imagenes'
+            imagen = obj.imagenes.filter(es_principal=True).first()
+            if imagen and imagen.imagen:
+                return imagen.imagen.url
+            return None
+        except Exception:
+            return None 
 
 # -----------------------------------------------
 # 2. Serializador del Último Mensaje
