@@ -181,7 +181,7 @@ if Match is not None:
 # Notificación cuando llega un MENSAJE de chat
 # --------------------------------------------------------
 if Mensaje is not None:
-    @receiver(post_save, sender=Mensaje)
+    @receiver(post_save, sender=Mensaje, dispatch_uid='notificar_mensaje_chat')
     def notificar_mensaje_chat(sender, instance, created, **kwargs):
         if not created:
             return

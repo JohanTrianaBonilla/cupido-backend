@@ -275,7 +275,7 @@ def obtener_usuarios_ya_interactuados(user_id: int) -> Set[int]:
 def obtener_perfiles_sugeridos(
     perfil_usuario: Perfil,
     preferencias: Preference,
-    limite: int = 100,  # Cambiado de 30 a 100
+    limite: int = 100,  # Aumentado para compensar los filtrados
     con_score: bool = False,
 ):
     """
@@ -314,3 +314,4 @@ def obtener_perfiles_sugeridos(
         return compatibles[:limite]
 
     return [p for p, _ in compatibles[:limite]]
+

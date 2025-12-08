@@ -10,11 +10,12 @@ class notificacion(models.Model):
     EVENT_LIKE = 'like'
     EVENT_MATCH = 'match'
     EVENT_CHAT = 'chat'
+    EVENT_REPORT = "Reporte"
     EVENT_CHOICES = [
         (EVENT_LIKE, 'Like'),
         (EVENT_MATCH, 'Match'),
         (EVENT_CHAT, "Chat"),
-        (EVENT_CHAT, "Reporte"),
+        (EVENT_REPORT, "Reporte"),
     ]
 
     STATUS_PENDING = 'pendiente'
