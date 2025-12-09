@@ -17,14 +17,19 @@ def get_user_from_token(token_key):
     try:
         # 1. Validar el token y obtener el ID de usuario
         token = AccessToken(token_key)
-        user_id = token['user_id']
+        # El claim en el token es 'usuario_id' según SIMPLE_JWT settings
+        user_id = token.get('usuario_id') or token.get('user_id')
         
-        # 2. Obtener el usuario desde la base de datos
-        return User.objects.get(pk=user_id)
+        if not user_id:
+            return AnonymousUser()
         
-    except (TokenError, User.DoesNotExist, KeyError):
+        # 2. Obtener el usuario desde la base de datos usando usuario_id
+        return User.objects.get(usuario_id=user_id)
+        
+    except (TokenError, User.DoesNotExist, KeyError) as e:
         # 3. Si el token es inválido o el usuario no existe,
         # devolvemos un "Usuario Anónimo".
+        print(f"Error validando token WS: {e}")
         return AnonymousUser()
 
 class JwtAuthMiddleware:
