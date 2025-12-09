@@ -50,7 +50,7 @@ if DetallesLike is not None:
         if usuario_receptor is None or usuario_emisor is None:
             return
 
-        nombre_emisor = getattr(usuario_emisor, 'username', 'Alguien')
+        nombre_emisor = getattr(usuario_emisor, 'nombres', 'Alguien')
         mensaje = f"{nombre_emisor} te dio like"
 
         notif = notificacion.objects.create(
