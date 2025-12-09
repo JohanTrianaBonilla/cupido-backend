@@ -48,6 +48,14 @@ class notificacion(models.Model):
         related_name='notificaciones'
     )
 
+    usuario_origen = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='notificaciones_enviadas'
+    )
+
     class Meta:
         db_table = 'notificacion'
         ordering = ['-fecha_envio']
