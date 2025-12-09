@@ -97,6 +97,12 @@ if Chat is not None:
         user_a = match.usuarioA
         user_b = match.usuarioB
 
+        # Excluir notificaciones para match de bienvenida con usuario ID 1
+        WELCOME_USER_ID = 1
+        if user_a.id == WELCOME_USER_ID or user_b.id == WELCOME_USER_ID:
+            logger.info(f"Ignorando notificación de match de bienvenida con usuario ID {WELCOME_USER_ID}")
+            return
+
         # Ya tenemos el chat, es 'instance'
         chat_id = chat.id
 
