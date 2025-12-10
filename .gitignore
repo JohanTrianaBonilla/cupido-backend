@@ -145,3 +145,4 @@ PROJECT_REVIEW.md
 /apps/profile_app/migrations
 /apps/chat_app/migrations
 requirements.txt
+/apps/auth_app/management
