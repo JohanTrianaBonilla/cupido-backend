@@ -210,3 +210,41 @@ class MatchRecommendationsView(APIView):
             },
             status=status.HTTP_200_OK,
         )
+
+
+class CheckMatchView(APIView):
+    """
+    Verifica si existe un match activo entre el usuario autenticado y otro usuario.
+    
+    GET /match/check/{user_id}/
+    
+    Retorna:
+        - has_match: boolean indicando si existe match
+        - match_id: ID del match si existe (opcional)
+    """
+    
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request, user_id, *args, **kwargs):
+        from .models import Match
+        from django.db.models import Q
+        
+        current_user_id = request.user.usuario_id
+        
+        # Buscar match en ambas direcciones (el usuario puede ser A o B)
+        match = Match.objects.filter(
+            Q(usuarioA_id=current_user_id, usuarioB_id=user_id) |
+            Q(usuarioA_id=user_id, usuarioB_id=current_user_id),
+            estadoMatch='ACTIVO'
+        ).first()
+        
+        if match:
+            return Response({
+                "has_match": True,
+                "match_id": match.id
+            }, status=status.HTTP_200_OK)
+        
+        return Response({
+            "has_match": False
+        }, status=status.HTTP_200_OK)
+
