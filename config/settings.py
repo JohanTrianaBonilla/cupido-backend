@@ -93,6 +93,7 @@ INSTALLED_APPS = [
     "apps.preferences_app",
     "apps.notificacion_app",
     'apps.like_app',
+    'apps.admin_app',
     # Third-party
     "rest_framework",
     "rest_framework_simplejwt",
