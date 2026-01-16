@@ -18,7 +18,7 @@ class LoginSerializer(serializers.Serializer):
     """
 
     # Campos en orden: reCAPTCHA primero para fail-fast
-    recaptcha_token = serializers.CharField(write_only=True, required=True, allow_blank=False)
+    #recaptcha_token = serializers.CharField(write_only=True, required=True, allow_blank=False)
     email = serializers.EmailField()
     contrasena = serializers.CharField(write_only=True)
 

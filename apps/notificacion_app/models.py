@@ -10,11 +10,12 @@ class notificacion(models.Model):
     EVENT_LIKE = 'like'
     EVENT_MATCH = 'match'
     EVENT_CHAT = 'chat'
+    EVENT_REPORT = "Reporte"
     EVENT_CHOICES = [
         (EVENT_LIKE, 'Like'),
         (EVENT_MATCH, 'Match'),
         (EVENT_CHAT, "Chat"),
-        (EVENT_CHAT, "Reporte"),
+        (EVENT_REPORT, "Reporte"),
     ]
 
     STATUS_PENDING = 'pendiente'
@@ -35,6 +36,24 @@ class notificacion(models.Model):
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name='notificaciones'
+    )
+    
+    # Campo opcional para relacionar notificación con un chat específico
+    # Esto permite actualizar la notificación existente en lugar de crear duplicados
+    chat_relacionado = models.ForeignKey(
+        'chat_app.Chat',
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='notificaciones'
+    )
+
+    usuario_origen = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='notificaciones_enviadas'
     )
 
     class Meta:

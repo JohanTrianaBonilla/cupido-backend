@@ -10,7 +10,11 @@ urlpatterns = [
     path('<int:chat_id>/enviar/', views.enviar_mensaje, name='enviar-mensaje'),
     path('<int:chat_id>/vaciar/', views.vaciar_chat, name='vaciar-chat'),
     
-    # (Aquí también pondremos la lógica de bloquear/reportar después)
+    # Endpoints para gestionar estado "chat abierto" (evita notificaciones duplicadas)
+    # POST /api/v1/chat/1/abrir/  - Marca que el usuario tiene el chat abierto
+    path('<int:chat_id>/abrir/', views.abrir_chat, name='abrir-chat'),
+    # POST /api/v1/chat/1/cerrar/  - Marca que el usuario cerró el chat
+    path('<int:chat_id>/cerrar/', views.cerrar_chat, name='cerrar-chat'),
 
     path('', views.obtener_lista_chats, name='obtener_lista_chats'),
 ]

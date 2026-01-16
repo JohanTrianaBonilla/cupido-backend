@@ -28,10 +28,7 @@ class UserUpdateView(APIView):
 
        
         def patch(self, request):
-            logger.info("=== USER UPDATE ENDPOINT ===")
             logger.info(f"Usuario autenticado: {request.user.email}")
-            logger.info(f"Datos recibidos: {request.data}")
-            logger.info(f"Headers: {request.headers}")
 
         # Generar respuesta estructurada
         response = get_user_update_response_data(user)

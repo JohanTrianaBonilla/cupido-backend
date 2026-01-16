@@ -307,3 +307,87 @@ def vaciar_chat(request, chat_id):
     except Exception as e:
         print(f"ERROR al vaciar chat {chat_id}: {e}")
         return Response({"error": "Error interno al vaciar el chat."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+# ============================================================
+# ENDPOINTS PARA GESTIONAR EL ESTADO "CHAT ABIERTO"
+# Esto evita que se envíen notificaciones cuando el usuario
+# está activamente viendo el chat.
+# ============================================================
+from django.core.cache import cache
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def abrir_chat(request, chat_id):
+    """
+    Marca que el usuario tiene el chat abierto.
+    Mientras esté abierto, no recibirá notificaciones de ese chat.
+    """
+    user = request.user
+    try:
+        # Validar que el chat existe y el usuario pertenece a él
+        chat = Chat.objects.select_related(
+            'match', 'match__usuarioA', 'match__usuarioB'
+        ).get(id=chat_id, activo=True)
+
+        if chat.match.usuarioA != user and chat.match.usuarioB != user:
+            return Response(
+                {"error": "No tienes permiso para este chat."},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        # Guardar en cache que el usuario tiene este chat abierto
+        # Expira en 30 minutos por si el usuario no cierra correctamente
+        cache_key = f"chat_abierto_usuario_{user.id}"
+        cache.set(cache_key, chat.id, timeout=1800)  # 30 minutos
+        
+        print(f"✅ Usuario {user.id} abrió chat {chat.id}")
+        
+        return Response(
+            {"message": "Chat marcado como abierto", "chat_id": chat.id},
+            status=status.HTTP_200_OK
+        )
+
+    except Chat.DoesNotExist:
+        return Response(
+            {"error": "Chat no encontrado."},
+            status=status.HTTP_404_NOT_FOUND
+        )
+    except Exception as e:
+        print(f"ERROR al marcar chat {chat_id} como abierto: {e}")
+        return Response(
+            {"error": "Error interno."},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def cerrar_chat(request, chat_id):
+    """
+    Marca que el usuario cerró el chat.
+    Volverá a recibir notificaciones de ese chat.
+    """
+    user = request.user
+    try:
+        # No es necesario validar permisos aquí, simplemente limpiamos el cache
+        cache_key = f"chat_abierto_usuario_{user.id}"
+        current_chat_id = cache.get(cache_key)
+        
+        # Solo limpiar si el chat que se cierra es el mismo que está abierto
+        if current_chat_id == int(chat_id):
+            cache.delete(cache_key)
+            print(f"✅ Usuario {user.id} cerró chat {chat_id}")
+        
+        return Response(
+            {"message": "Chat marcado como cerrado"},
+            status=status.HTTP_200_OK
+        )
+
+    except Exception as e:
+        print(f"ERROR al marcar chat {chat_id} como cerrado: {e}")
+        return Response(
+            {"error": "Error interno."},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+

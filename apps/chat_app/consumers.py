@@ -89,7 +89,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         # Al desconectarse, actualizamos también su última vez en línea
         if not self.user.is_anonymous:
             await touch_user_last_login(self.user)
-        print(f"Usuario {self.user.email} desconectado (código: {close_code})")
+            print(f"Usuario {self.user.email} desconectado (código: {close_code})")
 
 
     async def receive(self, text_data):

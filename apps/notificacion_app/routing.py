@@ -5,5 +5,5 @@ from . import consumers
 websocket_urlpatterns = [
     # Cuando un cliente se conecte al WebSocket en esta URL:
     # ws://<tu_dominio>/ws/notificaciones/
-    re_path(r'ws/notificaciones/(?P<user_id>\d+)/$', consumers.NotificationConsumer.as_asgi()),
+    re_path(r'^ws/notificaciones/(?P<user_id>\d+)/$', consumers.NotificationConsumer.as_asgi()),
 ]

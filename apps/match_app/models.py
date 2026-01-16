@@ -1,24 +1,30 @@
 from django.db import models
-from django.conf import settings # Para traer el modelo de Usuario
-
-# --- MODELO TEMPORAL DE MATCH ---
-# Esto es solo un placeholder para que la app de chat pueda funcionar.
+from django.conf import settings
 
 class Match(models.Model):
+    """
+    Modelo principal de Match entre dos usuarios.
+    Los usuarios se almacenan en orden de ID para asegurar la unicidad del par.
+    """
     usuarioA = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
-        related_name="matches_usuario_a"
+        related_name='matches_como_a'
     )
     usuarioB = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
-        related_name="matches_usuario_b"
+        related_name='matches_como_b'
     )
-
-    # Agregamos los campos que tu diagrama mencionaba
     fechaMatch = models.DateTimeField(auto_now_add=True)
-    estadoMatch = models.CharField(max_length=50, default="activo")
+    afinidad = models.DecimalField(max_digits=5, decimal_places=2, default=0.00)
+    estadoMatch = models.CharField(max_length=10, default='ACTIVO')
+
+    class Meta:
+        db_table = 'match_app_match'
+        unique_together = ('usuarioA', 'usuarioB')
+        verbose_name = "Match"
+        verbose_name_plural = "Matches"
 
     def __str__(self):
-        return f"Match temporal entre {self.usuarioA} y {self.usuarioB}"
+        return f'Match entre {self.usuarioA} y {self.usuarioB}'
